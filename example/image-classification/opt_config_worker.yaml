@@ -1,0 +1,9 @@
+MongoDB:
+  host: localhost
+  port: 27017
+experiment_name:
+  adam: adam:batch_size-lr-num_epochs
+  sgd: sgd:batch_size-lr-num_epochs
+features: '111'
+max_evals: 5
+project_name: tune_DL

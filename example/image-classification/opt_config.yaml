@@ -1,0 +1,6 @@
+max_evals: 5
+project_name: 'tune_DL'  # same for database name
+MongoDB:
+  host: localhost
+  port: 27017
+features: '111'
