@@ -46,10 +46,11 @@ def fit(args, network, data_loader, batch_end_callback=None):
     # data
     (train, val) = data_loader(args, kv)
 
-    # train
+    train
     devs = mx.cpu() if args.gpus is None else [
         mx.gpu(int(i)) for i in args.gpus.split(',')]
 
+    # devs = [mx.cpu(int(i)) for i in range(1)]
     epoch_size = args.num_examples / args.batch_size
 
     if args.kv_store == 'dist_sync':
@@ -79,17 +80,18 @@ def fit(args, network, data_loader, batch_end_callback=None):
         initializer        = mx.init.Xavier(factor_type="in", magnitude=2.34),
         **model_args)
 
-    eval_metrics = ['accuracy']
+    eval_metrics = ['accuracy', 'ce']
     ## TopKAccuracy only allows top_k > 1
-    for top_k in [5, 10, 20]:
-        eval_metrics.append(mx.metric.create('top_k_accuracy', top_k = top_k))
-
+    # for top_k in [5, 10, 20]:
+    #     eval_metrics.append(mx.metric.create('top_k_accuracy', top_k = top_k))
+    
     if batch_end_callback is not None:
         if not isinstance(batch_end_callback, list):
             batch_end_callback = [batch_end_callback]
     else:
         batch_end_callback = []
-    batch_end_callback.append(mx.callback.Speedometer(args.batch_size, 50))
+    #batch_end_callback.append(mx.callback.Speedometer(args.batch_size, 50))
+    batch_end_callback.append(log_train_eval_metric(5))
 
     model.fit(
         X                  = train,
@@ -98,3 +100,29 @@ def fit(args, network, data_loader, batch_end_callback=None):
         kvstore            = kv,
         batch_end_callback = batch_end_callback,
         epoch_end_callback = checkpoint)
+from mxnet.callback import log_train_metric
+def log_train_eval_metric(period, auto_reset=False):
+    """Callback to log the training evaluation result every period.
+
+    Parameters
+    ----------
+    period : int
+        The number of batch to log the training evaluation metric.
+    auto_reset : bool
+        Reset the metric after each log
+
+    Returns
+    -------
+    callback : function
+        The callback function that can be passed as iter_epoch_callback to fit.
+    """
+    def _callback(param):
+        """The checkpoint function."""
+        if param.nbatch % period == 0 and param.eval_metric is not None:
+            name_value = param.eval_metric.get_name_value()
+            for name, value in name_value:
+                logging.info('Iter[%d] Batch[%d] Train-%s=%f',
+                             param.epoch, param.nbatch, name, value)
+            if auto_reset:
+                param.eval_metric.reset()
+    return _callback

@@ -132,6 +132,8 @@ def parse_args():
                         help='times the lr with a factor for every lr-factor-epoch epoch')
     parser.add_argument('--lr-factor-epoch', type=float, default=1,
                         help='the number of epoch to factor the lr, could be .5')
+    parser.add_argument('--log-file',type=str, help="save print out to file")
+    parser.add_argument('--log-dir',type=str, default="./", help="save print out to file")
     return parser.parse_args()
 
 
