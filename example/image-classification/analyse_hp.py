@@ -48,6 +48,3 @@ for clf_name, db_collection in config['experiment_name'].items():
     tmp = pd.concat((log_metrics['val']), axis=0)
     tmp.to_csv("val_%s.csv" % db_collection, index=False)    
     # metrics['val'].append(tmp)
-
-    
-
