@@ -5,6 +5,7 @@ from scipy.stats.distributions import expon, randint
 from optomatic.jobs import JobsDB
 from optomatic.utils import yread, ywrite
 import argparse
+import numpy as np
 
 
 def parse_cli():
@@ -40,8 +41,18 @@ def get_param_space():
     # param_types['rfc'] = {'n_estimators': 'int', 'max_features': 'int'}
 
     param_space = {}
-    param_space['sgd'] = {'lr': randint(-6, -1), 'num_epochs': randint(2, 5), 'batch_size': randint(4, 8)}
-    param_space['adam'] = {'lr': randint(-6, -1), 'num_epochs': randint(2, 5), 'batch_size': randint(4, 8)}
+    param_space['sgd'] = {'solver': ['sgd'],
+                          'primary_metric': [np.random.choice(['ce', 'accuracy'])],
+                          'lr': randint(-6, -1),
+                          'L2': randint(-8, -1),
+                          'num_epochs': randint(2, 5),
+                          'batch_size': randint(4, 8)}
+    param_space['adam'] = {'solver': ['adam'],
+                           'primary_metric': [np.random.choice(['ce', 'accuracy'])],
+                           'lr': randint(-6, -1),
+                           'L2': randint(-8, -1),
+                           'num_epochs': randint(2, 5),
+                           'batch_size': randint(4, 8)}
 
     '''
     clfs maps string-names to a cloneable clf instance.

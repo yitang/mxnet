@@ -134,6 +134,9 @@ def parse_args():
                         help='the number of epoch to factor the lr, could be .5')
     parser.add_argument('--log-file',type=str, help="save print out to file")
     parser.add_argument('--log-dir',type=str, default="./", help="save print out to file")
+    parser.add_argument('--L2', type=float, help='L2 regulisation')
+    parser.add_argument('--solver', type=str, help='type of optimise solver', choices=['sgd', 'adam'])
+    parser.add_argument('--primary-metric', type=str, help='primary metric to learn', choices=['ce', 'accuracy'])
     return parser.parse_args()
 
 

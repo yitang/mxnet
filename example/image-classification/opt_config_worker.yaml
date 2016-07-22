@@ -2,8 +2,8 @@ MongoDB:
   host: localhost
   port: 27017
 experiment_name:
-  adam: adam:batch_size-lr-num_epochs
-  sgd: sgd:batch_size-lr-num_epochs
+  adam: adam:L2-batch_size-lr-num_epochs-primary_metric-solver
+  sgd: sgd:L2-batch_size-lr-num_epochs-primary_metric-solver
 features: '111'
-max_evals: 5
+max_evals: 50
 project_name: tune_DL

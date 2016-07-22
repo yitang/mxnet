@@ -70,6 +70,21 @@ def fit(args, network, data_loader, batch_end_callback=None):
             args.gpus is None or len(args.gpus.split(',')) is 1):
         kv = None
 
+    if args.solver == 'sgd':
+        optimizer = mx.optimizer.create('sgd',
+                                        rescale_grad=(1.0 / args.batch_size),
+                                        learning_rate=args.lr,
+                                        momentum=0.9,  # only a fraction of previous parameters are added to current parameters.
+                                        wd=args.L2, )  # L2 regularization coefficient add to all the weights
+    elif args.solver == 'adam':
+        optimizer = mx.optimizer.create('adam',
+                                        rescale_grad=(1.0 / args.batch_size),
+                                        learning_rate=args.lr,
+                                        # wd=0.00001)
+                                        wd=args.L2)
+    else:
+        raise NotImplementedError
+
     model = mx.model.FeedForward(
         ctx                = devs,
         symbol             = network,
@@ -78,9 +93,15 @@ def fit(args, network, data_loader, batch_end_callback=None):
         momentum           = 0.9,
         wd                 = 0.00001,
         initializer        = mx.init.Xavier(factor_type="in", magnitude=2.34),
+        optimizer = optimizer,
         **model_args)
 
-    eval_metrics = ['accuracy', 'ce']
+    if args.primary_metric == 'ce':
+        eval_metrics = ['ce', 'accuracy']
+    elif args.primary_metric == 'accuracy':
+        eval_metrics = ['accuracy', 'ce']
+    else:
+        raise NotImplementedError
     ## TopKAccuracy only allows top_k > 1
     # for top_k in [5, 10, 20]:
     #     eval_metrics.append(mx.metric.create('top_k_accuracy', top_k = top_k))

@@ -1,4 +1,4 @@
-max_evals: 5
+max_evals: 50
 project_name: 'tune_DL'  # same for database name
 MongoDB:
   host: localhost
